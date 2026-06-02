@@ -1376,27 +1376,9 @@ function goTo(id) {
   const el = document.getElementById(id);
   if (!el) return;
   const OFFSET = 80; // Sticky-Nav (~74px) + Seitenrand freihalten
-  const target = () => Math.max(0, el.getBoundingClientRect().top + window.pageYOffset - OFFSET);
-
-  const mm = (q) => window.matchMedia && window.matchMedia(q).matches;
-  const instant = mm("(pointer: coarse)") || mm("(prefers-reduced-motion: reduce)");
-
-  if (instant) {
-    // Touch-Geräte: SOFORT an die exakte Position springen — ohne Animation.
-    // Eine animierte Smooth-Scroll wird auf dem Handy abgebrochen, sobald sich
-    // beim Scrollen die Adressleiste einklappt oder Schriften nachladen → die
-    // Seite blieb dann mittendrin stehen. Sofortiges Scrollen landet exakt.
-    window.scrollTo(0, target());
-    requestAnimationFrame(() => window.scrollTo(0, target()));
-    // Nachkorrektur, falls sich das Layout noch setzt (Schriften/Bilder) —
-    // aber nur, wenn der Nutzer nicht selbst inzwischen weitergescrollt ist.
-    const settled = window.pageYOffset;
-    setTimeout(() => {
-      if (Math.abs(window.pageYOffset - settled) < 4) window.scrollTo(0, target());
-    }, 300);
-  } else {
-    window.scrollTo({ top: target(), behavior: "smooth" });
-  }
+  const top = Math.max(0, el.getBoundingClientRect().top + window.pageYOffset - OFFSET);
+  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  window.scrollTo({ top, behavior: reduce ? "auto" : "smooth" });
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -2271,6 +2253,19 @@ function Booking() {
   const [errs, setErrs] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [submitErr, setSubmitErr] = useState(null);
+  const mainRef = useRef(null);
+  const firstStepRef = useRef(true);
+
+  // Bei jedem Schrittwechsel sanft an den Anfang des Formulars scrollen,
+  // damit jeder Schritt oben beginnt und die Seite nicht unkontrolliert springt.
+  useEffect(() => {
+    if (firstStepRef.current) { firstStepRef.current = false; return; }
+    const el = mainRef.current;
+    if (!el) return;
+    const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const top = Math.max(0, el.getBoundingClientRect().top + window.pageYOffset - 80);
+    window.scrollTo({ top, behavior: reduce ? "auto" : "smooth" });
+  }, [step]);
 
   const price = size ? SIZES.find(s => s.id === size).price : 0;
 
@@ -2369,7 +2364,7 @@ function Booking() {
         <div className="blob-bg"></div>
       </div>
 
-      <div className="book-main">
+      <div className="book-main" ref={mainRef}>
         <div className="steps">
           {[0, 1, 2, 3].map(i => (
             <div key={i} className={`step-pip ${i === step ? "on" : ""} ${i < step ? "done" : ""}`}></div>
