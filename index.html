@@ -355,6 +355,22 @@ html[data-hero="zentriert"] .hero .lead{ margin-left:auto; margin-right:auto; }
 .slot.off{ opacity:.35; cursor:not-allowed; text-decoration:line-through; }
 .days{ display:flex; gap:10px; overflow-x:auto; padding-bottom:6px; -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity; }
 .days .day{ scroll-snap-align:start; }
+/* Monatskalender */
+.cal{ background:var(--surface-2); border:2px solid var(--line); border-radius:18px; padding:14px 16px; max-width:440px; }
+.cal-hd{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.cal-title{ font-family:var(--font-display); font-weight:700; font-size:17px; text-transform:capitalize; }
+.cal-nav{ display:flex; gap:8px; }
+.cal-nav button{ width:36px; height:36px; border-radius:10px; border:1px solid var(--line); background:var(--surface); cursor:pointer; font-size:18px; color:var(--ink); display:grid; place-items:center; transition:background .15s, color .15s, opacity .15s; }
+.cal-nav button:hover:not(:disabled){ background:var(--c1-100); color:var(--c1-600); }
+.cal-nav button:disabled{ opacity:.3; cursor:not-allowed; }
+.cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+.cal-dow{ text-align:center; font-size:11px; font-weight:700; text-transform:uppercase; color:var(--muted); padding:4px 0 6px; }
+.cal-cell{ aspect-ratio:1/1; border:0; background:transparent; border-radius:12px; cursor:pointer; font-family:var(--font-display); font-weight:600; font-size:15px; color:var(--ink); display:grid; place-items:center; transition:background .15s, color .15s, transform .12s; }
+.cal-cell:hover:not(:disabled):not(.sel){ background:var(--c1-100); color:var(--c1-600); transform:translateY(-1px); }
+.cal-cell.today{ box-shadow:inset 0 0 0 2px var(--c1-soft); }
+.cal-cell.sel{ background:var(--c1); color:#fff; box-shadow:0 6px 14px -6px var(--c1); }
+.cal-cell:disabled{ color:var(--muted); opacity:.32; cursor:not-allowed; }
+.cal-cell.empty{ visibility:hidden; pointer-events:none; }
 .day{ flex:none; width:74px; text-align:center; padding:12px 6px; border-radius:16px; border:2px solid var(--line); background:var(--surface-2); cursor:pointer; transition:all .15s; }
 .day.sel{ background:var(--c1); color:#fff; border-color:var(--c1); }
 .day .dow{ font-size:12px; font-weight:700; text-transform:uppercase; opacity:.8; }
@@ -2154,23 +2170,64 @@ const SERVICES = [
   { id: "schur", label: "Schur / Trimmen", sub: "Fellschnitt nach Rasse" },
   { id: "unterwolle", label: "Unterwoll-Kur", sub: "Entfilzen & Entwollen" },
 ];
-const TIMES = ["09:00", "10:00", "11:00", "12:00", "14:00", "15:00", "16:00", "17:00"];
+const TIMES = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
+// Späteste buchbare Startzeit je Wochentag (0=So … 6=Sa). Salon schließt Mo–Fr 18 Uhr, Sa 14 Uhr.
+const LAST_SLOT = { 1: 17, 2: 17, 3: 17, 4: 17, 5: 17, 6: 13 };
 const DOW = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
 const MON = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
 
-function buildDays(n) {
-  const out = []; const today = new Date();
-  let d = new Date(today); let added = 0;
-  while (added < n) {
-    d = new Date(d.getTime() + 86400000);
-    if (d.getDay() !== 0) {
-      out.push({ dow: DOW[d.getDay()], dnum: d.getDate(), dmon: MON[d.getMonth()], key: d.toISOString().slice(0, 10), full: `${DOW[d.getDay()]}, ${d.getDate()}. ${MON[d.getMonth()]}` });
-      added++;
-    }
-  }
-  return out;
+const CAL_DOW = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
+const MON_FULL = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+const isoKey = (dt) => `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}-${String(dt.getDate()).padStart(2, "0")}`;
+function fmtFull(key) {
+  const [y, m, d] = key.split("-").map(Number);
+  const dt = new Date(y, m - 1, d);
+  return `${DOW[dt.getDay()]}, ${d}. ${MON[m - 1]} ${y}`;
 }
-const DAYS = buildDays(10);
+
+function Calendar({ value, onSelect }) {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const initMonth = value
+    ? (() => { const [y, m] = value.split("-").map(Number); return new Date(y, m - 1, 1); })()
+    : new Date(today.getFullYear(), today.getMonth(), 1);
+  const [view, setView] = useState(initMonth);
+  const year = view.getFullYear(), month = view.getMonth();
+  const firstDow = (new Date(year, month, 1).getDay() + 6) % 7; // 0 = Montag
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const cells = [];
+  for (let i = 0; i < firstDow; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(year, month, d));
+  const atCurrentMonth = year === today.getFullYear() && month === today.getMonth();
+
+  return (
+    <div className="cal">
+      <div className="cal-hd">
+        <span className="cal-title">{MON_FULL[month]} {year}</span>
+        <div className="cal-nav">
+          <button type="button" aria-label="Voriger Monat" disabled={atCurrentMonth}
+            onClick={() => setView(new Date(year, month - 1, 1))}>‹</button>
+          <button type="button" aria-label="Nächster Monat"
+            onClick={() => setView(new Date(year, month + 1, 1))}>›</button>
+        </div>
+      </div>
+      <div className="cal-grid">
+        {CAL_DOW.map(d => <div key={d} className="cal-dow">{d}</div>)}
+        {cells.map((dt, i) => {
+          if (!dt) return <div key={"e" + i} className="cal-cell empty" aria-hidden="true"></div>;
+          const key = isoKey(dt);
+          const disabled = dt.getDay() === 0 || dt < today; // Sonntag geschlossen + Vergangenheit
+          const isToday = dt.getTime() === today.getTime();
+          return (
+            <button type="button" key={key} disabled={disabled}
+              className={`cal-cell ${value === key ? "sel" : ""} ${isToday ? "today" : ""}`}
+              aria-pressed={value === key}
+              onClick={() => onSelect(key)}>{dt.getDate()}</button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 function Booking() {
   const [step, setStep] = useState(0);
@@ -2241,7 +2298,8 @@ function Booking() {
 
   const sizeObj = SIZES.find(s => s.id === size);
   const servObj = SERVICES.find(s => s.id === service);
-  const dayObj = DAYS.find(d => d.key === day);
+  const dayObj = day ? { key: day, full: fmtFull(day) } : null;
+  const weekday = day ? (() => { const [y, m, d] = day.split("-").map(Number); return new Date(y, m - 1, d).getDay(); })() : null;
 
   return (
     <div className="book-shell" id="booking-shell">
@@ -2292,20 +2350,18 @@ function Booking() {
         {step === 1 && (
           <div>
             <h3 style={{ fontSize: 22, marginBottom: 4 }}>2. Datum & Uhrzeit</h3>
-            <p style={{ color: "var(--muted)", marginBottom: 16 }}>Wähle einen freien Tag.</p>
-            <div className="days">
-              {DAYS.map(d => (
-                <div key={d.key} className={`day ${day === d.key ? "sel" : ""}`} onClick={() => setDay(d.key)}>
-                  <div className="dow">{d.dow}</div>
-                  <div className="dnum">{d.dnum}</div>
-                  <div className="dmon">{d.dmon}</div>
-                </div>
-              ))}
-            </div>
+            <p style={{ color: "var(--muted)", marginBottom: 16 }}>Wähle einen freien Tag. (Sonntags geschlossen)</p>
+            <Calendar value={day} onSelect={(k) => { setDay(k); setTime(null); }} />
             <p style={{ color: "var(--muted)", margin: "22px 0 12px" }}>Freie Uhrzeiten {dayObj ? `am ${dayObj.full}` : ""}</p>
+            {day && weekday === 6 && (
+              <p style={{ color: "var(--c1-600)", fontWeight: 600, fontSize: 14, marginBottom: 12 }}>
+                Samstags schließen wir um 14 Uhr – letzter Termin um 13 Uhr.
+              </p>
+            )}
             <div className="slots">
-              {TIMES.map((t, i) => {
-                const off = !day || (i === 3);
+              {TIMES.map((t) => {
+                const hour = parseInt(t, 10);
+                const off = !day || hour > LAST_SLOT[weekday];
                 return (
                   <div key={t} className={`slot ${time === t ? "sel" : ""} ${off ? "off" : ""}`}
                        onClick={() => { if (!off) setTime(t); }}>{t}</div>
