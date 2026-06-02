@@ -666,7 +666,8 @@ section[id]{ scroll-margin-top:84px; }
     '  font:13px/1.3 system-ui,-apple-system,sans-serif;color:rgba(0,0,0,.55);width:240px;height:160px}' +
     '.frame{position:absolute;inset:0;overflow:hidden;background:rgba(0,0,0,.04)}' +
     '.frame img{position:absolute;max-width:none;transform:translate(-50%,-50%);' +
-    '  -webkit-user-drag:none;user-select:none;touch-action:none}' +
+    '  -webkit-user-drag:none;user-select:none;touch-action:auto}' +
+    ':host([data-reframe]) .frame img{touch-action:none}' +
     '.spill{position:absolute;transform:translate(-50%,-50%);display:none;z-index:1;' +
     '  cursor:grab;touch-action:none}' +
     ':host([data-panning]) .spill{cursor:grabbing}' +
@@ -2170,6 +2171,12 @@ const SERVICES = [
   { id: "schur", label: "Schur / Trimmen", sub: "Fellschnitt nach Rasse" },
   { id: "unterwolle", label: "Unterwoll-Kur", sub: "Entfilzen & Entwollen" },
 ];
+const STAFF = [
+  { id: "emika", name: "Emika", role: "Inhaberin & Hundefriseurin" },
+  { id: "jana", name: "Jana", role: "Groomerin" },
+  { id: "mira", name: "Mira", role: "Groomerin" },
+  { id: "tom", name: "Tom", role: "Bade & Wellness" },
+];
 const TIMES = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
 // Späteste buchbare Startzeit je Wochentag (0=So … 6=Sa). Salon schließt Mo–Fr 18 Uhr, Sa 14 Uhr.
 const LAST_SLOT = { 1: 17, 2: 17, 3: 17, 4: 17, 5: 17, 6: 13 };
@@ -2233,8 +2240,11 @@ function Booking() {
   const [step, setStep] = useState(0);
   const [size, setSize] = useState(null);
   const [service, setService] = useState(null);
+  const [staff, setStaff] = useState(null);
   const [day, setDay] = useState(null);
   const [time, setTime] = useState(null);
+  const [booked, setBooked] = useState([]);       // belegte Uhrzeiten (HH:MM) für gewählten Tag + Mitarbeiter
+  const [loadingSlots, setLoadingSlots] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", dog: "", notes: "" });
   const [errs, setErrs] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -2257,7 +2267,8 @@ function Booking() {
     const payload = {
       ...form,
       size: sizeObj?.label, service: servObj?.label,
-      day: dayObj?.full, time, price,
+      staff: staffObj?.id, staffName: staffObj?.name,
+      day: dayObj?.full, dayKey: day, time, price,
     };
     try {
       const r = await fetch("/api/buchung", {
@@ -2285,7 +2296,7 @@ function Booking() {
   }
 
   function next() {
-    if (step === 0 && (!size || !service)) return;
+    if (step === 0 && (!size || !service || !staff)) return;
     if (step === 1 && (!day || !time)) return;
     if (step === 2) {
       if (!validateContact()) return;
@@ -2298,8 +2309,27 @@ function Booking() {
 
   const sizeObj = SIZES.find(s => s.id === size);
   const servObj = SERVICES.find(s => s.id === service);
+  const staffObj = STAFF.find(s => s.id === staff);
   const dayObj = day ? { key: day, full: fmtFull(day) } : null;
   const weekday = day ? (() => { const [y, m, d] = day.split("-").map(Number); return new Date(y, m - 1, d).getDay(); })() : null;
+
+  // Belegte Uhrzeiten für Tag + Mitarbeiter laden (Doppelbuchung verhindern).
+  useEffect(() => {
+    if (step !== 1 || !day || !staff) { setBooked([]); return; }
+    let cancelled = false;
+    setLoadingSlots(true);
+    fetch(`/api/verfuegbarkeit?day=${encodeURIComponent(day)}&staff=${encodeURIComponent(staff)}`)
+      .then(r => (r.ok ? r.json() : { booked: [] }))
+      .then(d => {
+        if (cancelled) return;
+        const list = Array.isArray(d.booked) ? d.booked : [];
+        setBooked(list);
+        if (time && list.includes(time)) setTime(null); // inzwischen vergebene Auswahl zurücksetzen
+      })
+      .catch(() => { if (!cancelled) setBooked([]); }) // lokale Vorschau / offline: nicht blockieren
+      .finally(() => { if (!cancelled) setLoadingSlots(false); });
+    return () => { cancelled = true; };
+  }, [step, day, staff]);
 
   return (
     <div className="book-shell" id="booking-shell">
@@ -2344,6 +2374,15 @@ function Booking() {
                 </div>
               ))}
             </div>
+            <p style={{ color: "var(--muted)", margin: "20px 0 10px" }}>Bei wem möchtest du buchen?</p>
+            <div className="opt-grid">
+              {STAFF.map(s => (
+                <div key={s.id} className={`opt ${staff === s.id ? "sel" : ""}`}
+                     onClick={() => { setStaff(s.id); setTime(null); }}>
+                  <b>{s.name}</b><small>{s.role}</small>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
@@ -2352,7 +2391,10 @@ function Booking() {
             <h3 style={{ fontSize: 22, marginBottom: 4 }}>2. Datum & Uhrzeit</h3>
             <p style={{ color: "var(--muted)", marginBottom: 16 }}>Wähle einen freien Tag. (Sonntags geschlossen)</p>
             <Calendar value={day} onSelect={(k) => { setDay(k); setTime(null); }} />
-            <p style={{ color: "var(--muted)", margin: "22px 0 12px" }}>Freie Uhrzeiten {dayObj ? `am ${dayObj.full}` : ""}</p>
+            <p style={{ color: "var(--muted)", margin: "22px 0 12px" }}>
+              Freie Uhrzeiten{staffObj ? ` bei ${staffObj.name}` : ""}{dayObj ? ` am ${dayObj.full}` : ""}
+              {loadingSlots && <span style={{ marginLeft: 8, fontSize: 13 }}>· lädt …</span>}
+            </p>
             {day && weekday === 6 && (
               <p style={{ color: "var(--c1-600)", fontWeight: 600, fontSize: 14, marginBottom: 12 }}>
                 Samstags schließen wir um 14 Uhr – letzter Termin um 13 Uhr.
@@ -2361,13 +2403,18 @@ function Booking() {
             <div className="slots">
               {TIMES.map((t) => {
                 const hour = parseInt(t, 10);
-                const off = !day || hour > LAST_SLOT[weekday];
+                const off = !day || hour > LAST_SLOT[weekday] || booked.includes(t);
                 return (
                   <div key={t} className={`slot ${time === t ? "sel" : ""} ${off ? "off" : ""}`}
                        onClick={() => { if (!off) setTime(t); }}>{t}</div>
                 );
               })}
             </div>
+            {day && !loadingSlots && TIMES.every(t => parseInt(t, 10) > LAST_SLOT[weekday] || booked.includes(t)) && (
+              <p style={{ color: "var(--muted)", fontSize: 14, marginTop: 12 }}>
+                An diesem Tag ist {staffObj ? staffObj.name : "der/die Mitarbeiter:in"} leider ausgebucht – bitte wähle einen anderen Tag.
+              </p>
+            )}
           </div>
         )}
 
@@ -2416,11 +2463,12 @@ function Booking() {
             <div style={{ background: "var(--surface-2)", borderRadius: 18, padding: "20px 24px", marginTop: 22, textAlign: "left" }}>
               <div className="summary-row"><span className="k">Leistung</span><span className="v">{servObj && servObj.label}</span></div>
               <div className="summary-row"><span className="k">Größe</span><span className="v">{sizeObj && `${sizeObj.label} (${sizeObj.sub})`}</span></div>
+              <div className="summary-row"><span className="k">Mitarbeiter</span><span className="v">{staffObj && staffObj.name}</span></div>
               <div className="summary-row"><span className="k">Termin</span><span className="v">{dayObj && `${dayObj.full} · ${time} Uhr`}</span></div>
               <div className="summary-row"><span className="k">Richtpreis</span><span className="v">ab {price} €</span></div>
             </div>
             <button className="btn btn-green btn-lg" style={{ marginTop: 24 }}
-              onClick={() => { setStep(0); setSize(null); setService(null); setDay(null); setTime(null); setForm({ name: "", email: "", dog: "", notes: "" }); }}>
+              onClick={() => { setStep(0); setSize(null); setService(null); setStaff(null); setDay(null); setTime(null); setBooked([]); setForm({ name: "", email: "", dog: "", notes: "" }); }}>
               <Paw /> Neue Anfrage
             </button>
           </div>
@@ -2438,11 +2486,11 @@ function Booking() {
               {step > 0
                 ? <button className="btn btn-ghost" onClick={back} disabled={submitting}>Zurück</button>
                 : <span style={{ alignSelf: "center", color: "var(--muted)", fontWeight: 600, fontFamily: "var(--font-display)" }}>
-                    {size && service ? `Richtpreis ab ${price} €` : "Wähle Größe & Leistung"}
+                    {size && service && staff ? `Richtpreis ab ${price} €` : "Wähle Größe, Leistung & Mitarbeiter"}
                   </span>}
               <button className="btn btn-primary"
-                disabled={submitting || (step === 0 && (!size || !service)) || (step === 1 && (!day || !time))}
-                style={{ opacity: (submitting || (step === 0 && (!size || !service)) || (step === 1 && (!day || !time))) ? .6 : 1 }}
+                disabled={submitting || (step === 0 && (!size || !service || !staff)) || (step === 1 && (!day || !time))}
+                style={{ opacity: (submitting || (step === 0 && (!size || !service || !staff)) || (step === 1 && (!day || !time))) ? .6 : 1 }}
                 onClick={next}>
                 {submitting ? "Wird gesendet…" : step === 2 ? "Anfrage senden" : "Weiter"} <Paw />
               </button>
