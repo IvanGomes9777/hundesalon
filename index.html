@@ -50,7 +50,9 @@ html[data-theme="mint"]{
 }
 
 *{ box-sizing:border-box; }
-html,body{ margin:0; padding:0; }
+html,body{ margin:0; padding:0; width:100%; max-width:100%; }
+/* Horizontalen Überlauf am Scroll-Root unterbinden (clip bricht Sticky-Nav nicht) */
+html{ overflow-x:clip; }
 /* Scrollbar ausblenden (Scrollen bleibt aktiv) */
 html{ scrollbar-width:none; -ms-overflow-style:none; }
 html::-webkit-scrollbar{ width:0; height:0; display:none; }
@@ -60,7 +62,7 @@ body{
   background:var(--bg);
   line-height:1.6;
   -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
+  overflow-x:clip;
 }
 img{ max-width:100%; display:block; }
 a{ color:inherit; text-decoration:none; }
@@ -171,8 +173,11 @@ header.nav{
 .nav-links a{ font-family:var(--font-display); font-weight:500; font-size:15.5px; color:var(--ink); padding:9px 13px; border-radius:999px; transition:background .15s, color .15s; }
 .nav-links a:hover{ background:var(--c1-100); color:var(--c1-600); }
 .nav-cta{ display:flex; align-items:center; gap:10px; }
-.burger{ display:none; background:var(--surface); border:1px solid var(--line); border-radius:12px; width:46px; height:46px; cursor:pointer; }
-.burger span{ display:block; width:20px; height:2px; background:var(--ink); margin:4px auto; border-radius:2px; }
+.burger{ display:none; background:var(--surface); border:1px solid var(--line); border-radius:12px; width:46px; height:46px; cursor:pointer; padding:0; }
+.burger span{ display:block; width:20px; height:2px; background:var(--ink); margin:4px auto; border-radius:2px; transition:transform .25s var(--ease), opacity .2s; }
+.burger.open span:nth-child(1){ transform:translateY(6px) rotate(45deg); }
+.burger.open span:nth-child(2){ opacity:0; }
+.burger.open span:nth-child(3){ transform:translateY(-6px) rotate(-45deg); }
 .mobile-menu{ display:none; }
 
 /* ============================ HERO ============================ */
@@ -1731,31 +1736,33 @@ function Nav() {
     ["Bewertungen", "bewertungen"], ["Team", "team"], ["FAQ", "faq"], ["Kontakt", "kontakt"],
   ];
   return (
-    <header className="nav">
-      <div className="wrap nav-inner">
-        <a className="logo" href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
-          <Paw /> <span>Emika<b>.</b></span>
-        </a>
-        <nav className="nav-links">
-          {links.map(([l, id]) => (
-            <a key={id} href={"#" + id} onClick={(e) => { e.preventDefault(); goTo(id); }}>{l}</a>
-          ))}
-        </nav>
-        <div className="nav-cta">
-          <button className="btn btn-primary" onClick={() => goTo("buchen")}>
-            <Paw /><span className="lbl">Termin buchen</span>
-          </button>
-          <button className="burger" onClick={() => setOpen(o => !o)} aria-label="Menü">
-            <span></span><span></span><span></span>
-          </button>
+    <React.Fragment>
+      <header className="nav">
+        <div className="wrap nav-inner">
+          <a className="logo" href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
+            <Paw /> <span>Emika<b>.</b></span>
+          </a>
+          <nav className="nav-links">
+            {links.map(([l, id]) => (
+              <a key={id} href={"#" + id} onClick={(e) => { e.preventDefault(); goTo(id); }}>{l}</a>
+            ))}
+          </nav>
+          <div className="nav-cta">
+            <button className="btn btn-primary" onClick={() => goTo("buchen")}>
+              <Paw /><span className="lbl">Termin buchen</span>
+            </button>
+            <button className={`burger ${open ? "open" : ""}`} onClick={() => setOpen(o => !o)} aria-label="Menü" aria-expanded={open}>
+              <span></span><span></span><span></span>
+            </button>
+          </div>
         </div>
-      </div>
+      </header>
       <div className={`mobile-menu ${open ? "open" : ""}`}>
         {links.map(([l, id]) => (
           <a key={id} href={"#" + id} onClick={(e) => { e.preventDefault(); setOpen(false); goTo(id); }}>{l}</a>
         ))}
       </div>
-    </header>
+    </React.Fragment>
   );
 }
 
