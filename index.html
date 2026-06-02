@@ -2257,7 +2257,7 @@ function Booking() {
     const payload = {
       ...form,
       size: sizeObj?.label, service: servObj?.label,
-      day: dayObj?.full, time, price,
+      day: dayObj?.full, dayKey: day, time, price,
     };
     try {
       const r = await fetch("/api/buchung", {
