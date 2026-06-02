@@ -1372,43 +1372,31 @@ function DatenschutzContent() {
   );
 }
 
-let _goToRAF = null;
 function goTo(id) {
   const el = document.getElementById(id);
   if (!el) return;
   const OFFSET = 80; // Sticky-Nav (~74px) + Seitenrand freihalten
   const target = () => Math.max(0, el.getBoundingClientRect().top + window.pageYOffset - OFFSET);
 
-  // Reduzierte Bewegung respektieren → direkt springen
-  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (reduce) { window.scrollTo(0, target()); return; }
+  const mm = (q) => window.matchMedia && window.matchMedia(q).matches;
+  const instant = mm("(pointer: coarse)") || mm("(prefers-reduced-motion: reduce)");
 
-  // Eigenes Smooth-Scrolling per requestAnimationFrame.
-  // Das native scrollTo({behavior:"smooth"}) wird auf Mobil oft abgebrochen,
-  // wenn sich beim Scrollen die Adressleiste einklappt — dann bleibt die Seite
-  // nur ein kleines Stück weiter stehen. Hier berechnen wir das Ziel pro Frame
-  // neu und scrollen in kleinen Schritten, das ist nicht unterbrechbar.
-  if (_goToRAF) cancelAnimationFrame(_goToRAF);
-  let aborted = false;
-  const abort = () => { aborted = true; };
-  // Nur echtes Weiterscrollen/Wischen des Nutzers bricht ab, kein simpler Tap.
-  window.addEventListener("wheel", abort, { passive: true });
-  window.addEventListener("touchmove", abort, { passive: true });
-
-  const cleanup = () => {
-    _goToRAF = null;
-    window.removeEventListener("wheel", abort);
-    window.removeEventListener("touchmove", abort);
-  };
-  const tick = () => {
-    if (aborted) return cleanup();
-    const cur = window.pageYOffset;
-    const diff = target() - cur;
-    if (Math.abs(diff) < 1.5) { window.scrollTo(0, target()); return cleanup(); }
-    window.scrollTo(0, cur + diff * 0.2);
-    _goToRAF = requestAnimationFrame(tick);
-  };
-  _goToRAF = requestAnimationFrame(tick);
+  if (instant) {
+    // Touch-Geräte: SOFORT an die exakte Position springen — ohne Animation.
+    // Eine animierte Smooth-Scroll wird auf dem Handy abgebrochen, sobald sich
+    // beim Scrollen die Adressleiste einklappt oder Schriften nachladen → die
+    // Seite blieb dann mittendrin stehen. Sofortiges Scrollen landet exakt.
+    window.scrollTo(0, target());
+    requestAnimationFrame(() => window.scrollTo(0, target()));
+    // Nachkorrektur, falls sich das Layout noch setzt (Schriften/Bilder) —
+    // aber nur, wenn der Nutzer nicht selbst inzwischen weitergescrollt ist.
+    const settled = window.pageYOffset;
+    setTimeout(() => {
+      if (Math.abs(window.pageYOffset - settled) < 4) window.scrollTo(0, target());
+    }, 300);
+  } else {
+    window.scrollTo({ top: target(), behavior: "smooth" });
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────────
