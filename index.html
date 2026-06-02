@@ -1372,9 +1372,43 @@ function DatenschutzContent() {
   );
 }
 
+let _goToRAF = null;
 function goTo(id) {
   const el = document.getElementById(id);
-  if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 70, behavior: "smooth" });
+  if (!el) return;
+  const OFFSET = 80; // Sticky-Nav (~74px) + Seitenrand freihalten
+  const target = () => Math.max(0, el.getBoundingClientRect().top + window.pageYOffset - OFFSET);
+
+  // Reduzierte Bewegung respektieren → direkt springen
+  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduce) { window.scrollTo(0, target()); return; }
+
+  // Eigenes Smooth-Scrolling per requestAnimationFrame.
+  // Das native scrollTo({behavior:"smooth"}) wird auf Mobil oft abgebrochen,
+  // wenn sich beim Scrollen die Adressleiste einklappt — dann bleibt die Seite
+  // nur ein kleines Stück weiter stehen. Hier berechnen wir das Ziel pro Frame
+  // neu und scrollen in kleinen Schritten, das ist nicht unterbrechbar.
+  if (_goToRAF) cancelAnimationFrame(_goToRAF);
+  let aborted = false;
+  const abort = () => { aborted = true; };
+  // Nur echtes Weiterscrollen/Wischen des Nutzers bricht ab, kein simpler Tap.
+  window.addEventListener("wheel", abort, { passive: true });
+  window.addEventListener("touchmove", abort, { passive: true });
+
+  const cleanup = () => {
+    _goToRAF = null;
+    window.removeEventListener("wheel", abort);
+    window.removeEventListener("touchmove", abort);
+  };
+  const tick = () => {
+    if (aborted) return cleanup();
+    const cur = window.pageYOffset;
+    const diff = target() - cur;
+    if (Math.abs(diff) < 1.5) { window.scrollTo(0, target()); return cleanup(); }
+    window.scrollTo(0, cur + diff * 0.2);
+    _goToRAF = requestAnimationFrame(tick);
+  };
+  _goToRAF = requestAnimationFrame(tick);
 }
 
 /* ─────────────────────────────────────────────────────────────────
