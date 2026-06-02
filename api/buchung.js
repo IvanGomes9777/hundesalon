@@ -36,7 +36,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(204).end();
   if (req.method !== 'POST')   return res.status(405).json({ error: 'Method not allowed' });
 
-  const { name, email, dog, notes, size, service, day, dayKey, time, price } = req.body || {};
+  const { name, email, dog, notes, size, service, staff, staffName, day, dayKey, time, price } = req.body || {};
 
   if (!name || !email || !dog || !day || !time || !service || !size) {
     return res.status(400).json({ error: 'Fehlende Pflichtfelder' });
@@ -53,6 +53,21 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'E-Mail-Dienst nicht konfiguriert' });
   }
 
+  const gcalConfigured = !!(process.env.GOOGLE_SA_EMAIL && process.env.GOOGLE_SA_PRIVATE_KEY && process.env.GOOGLE_CALENDAR_ID);
+
+  // Doppelbuchung serverseitig prüfen, bevor wir bestätigen (nur wenn Kalender konfiguriert).
+  if (gcalConfigured && dayKey && time && staff) {
+    try {
+      const taken = await getBookedTimes({ dayKey, staff });
+      if (taken.includes(time)) {
+        return res.status(409).json({ error: 'Dieser Termin wurde leider gerade vergeben. Bitte wähle eine andere Uhrzeit.' });
+      }
+    } catch (err) {
+      console.error('Verfügbarkeitsprüfung fehlgeschlagen:', err);
+      // Im Zweifel nicht blockieren — lieber buchen lassen als Kunde abweisen.
+    }
+  }
+
   const firstName = String(name).split(/\s+/)[0];
   const safe = (s) => String(s).replace(/[<>&"']/g, c => ({
     '<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'
@@ -67,6 +82,7 @@ export default async function handler(req, res) {
       ['Für',         safe(dog)],
       ['Größe',       safe(size)],
       ['Leistung',    safe(service)],
+      ...(staffName ? [['Mitarbeiter', safe(staffName)]] : []),
       ['Wunschtermin', `${safe(day)} um ${safe(time)} Uhr`],
       ['Richtpreis',  `ab ${safe(price)} €`],
     ],
@@ -76,6 +92,7 @@ export default async function handler(req, res) {
     `Hallo ${firstName},\n\n` +
     `danke für deine Terminanfrage bei Hundesalon Emika. Wir haben deine Anfrage erhalten und melden uns in Kürze persönlich zur Bestätigung.\n\n` +
     `Für: ${dog}\nGröße: ${size}\nLeistung: ${service}\n` +
+    (staffName ? `Mitarbeiter: ${staffName}\n` : ``) +
     `Wunschtermin: ${day}, ${time} Uhr\nRichtpreis: ab ${price} €\n\n` +
     `Falls du Fragen hast, antworte einfach auf diese E-Mail.\n\n` +
     `— Hundesalon Emika, Münster`;
@@ -91,6 +108,7 @@ export default async function handler(req, res) {
       ['Hund',        safe(dog)],
       ['Größe',       safe(size)],
       ['Leistung',    safe(service)],
+      ...(staffName ? [['Mitarbeiter', safe(staffName)]] : []),
       ['Wunschtermin', `${safe(day)} um ${safe(time)} Uhr`],
       ['Richtpreis',  `ab ${safe(price)} €`],
       ...(notes ? [['Anmerkung', safe(notes)]] : []),
@@ -122,9 +140,9 @@ export default async function handler(req, res) {
   }
 
   // Google-Kalender-Eintrag — nur wenn vollständig konfiguriert, sonst still übersprungen.
-  if (process.env.GOOGLE_SA_EMAIL && process.env.GOOGLE_SA_PRIVATE_KEY && process.env.GOOGLE_CALENDAR_ID) {
+  if (gcalConfigured) {
     try {
-      await addToCalendar({ name, email, dog, notes, size, service, day, dayKey, time, price });
+      await addToCalendar({ name, email, dog, notes, size, service, staff, staffName, day, dayKey, time, price });
     } catch (err) {
       console.error('Google-Kalender-Eintrag fehlgeschlagen:', err);
     }
@@ -135,7 +153,7 @@ export default async function handler(req, res) {
 
 // ──────────────────────────────────────────────────────────────────────────
 // Google Kalender: Termin als Event eintragen (via Service-Account, ohne externe Pakete).
-async function addToCalendar({ name, email, dog, notes, size, service, day, dayKey, time, price }) {
+async function addToCalendar({ name, email, dog, notes, size, service, staff, staffName, day, dayKey, time, price }) {
   if (!dayKey || !/^\d{4}-\d{2}-\d{2}$/.test(String(dayKey))) {
     throw new Error('Ungültiges/fehlendes Datum (dayKey) für den Kalender');
   }
@@ -158,7 +176,7 @@ async function addToCalendar({ name, email, dog, notes, size, service, day, dayK
   });
 
   const event = {
-    summary: `🐾 ${service} – ${dog} (${name})`,
+    summary: `🐾 ${staffName ? staffName + ' · ' : ''}${service} – ${dog} (${name})`,
     description:
       `Online-Terminanfrage über die Website.\n\n` +
       `Kunde: ${name}\n` +
@@ -166,11 +184,14 @@ async function addToCalendar({ name, email, dog, notes, size, service, day, dayK
       `Hund: ${dog}\n` +
       `Größe: ${size}\n` +
       `Leistung: ${service}\n` +
+      (staffName ? `Mitarbeiter: ${staffName}\n` : '') +
       `Richtpreis: ab ${price} €` +
       (notes ? `\nAnmerkung: ${notes}` : '') +
       `\n\n(Hinweis: noch nicht final bestätigt — bitte beim Kunden rückmelden.)`,
     start: { dateTime: startISO, timeZone: tz },
     end:   { dateTime: endISO,   timeZone: tz },
+    // Marker, um Termine pro Mitarbeiter zu erkennen (Doppelbuchungs-Sperre).
+    extendedProperties: { private: { staff: staff || '', source: 'website' } },
   };
 
   const calId = process.env.GOOGLE_CALENDAR_ID;
@@ -187,6 +208,58 @@ async function addToCalendar({ name, email, dog, notes, size, service, day, dayK
     throw new Error(`Calendar ${r.status}: ${t.slice(0, 300)}`);
   }
   return r.json();
+}
+
+// Belegte Uhrzeiten (HH:MM) für einen Tag + Mitarbeiter aus dem Google-Kalender lesen.
+async function getBookedTimes({ dayKey, staff }) {
+  const accessToken = await getGoogleAccessToken({
+    email: process.env.GOOGLE_SA_EMAIL,
+    privateKey: String(process.env.GOOGLE_SA_PRIVATE_KEY).replace(/\\n/g, '\n'),
+  });
+  return listBookedTimes({
+    accessToken,
+    calId: process.env.GOOGLE_CALENDAR_ID,
+    dayKey,
+    staff,
+    tz: process.env.APPT_TIMEZONE || 'Europe/Berlin',
+  });
+}
+
+// Termine eines Tages auflisten und die belegten Startzeiten zurückgeben.
+// Ein Event zählt für den Mitarbeiter, wenn es mit dessen Kennung getaggt ist
+// ODER kein Mitarbeiter-Tag hat (z.B. manuell eingetragene Termine blockieren alle).
+async function listBookedTimes({ accessToken, calId, dayKey, staff, tz }) {
+  const params = new URLSearchParams({
+    singleEvents: 'true',
+    orderBy: 'startTime',
+    maxResults: '2500',
+    timeMin: `${dayKey}T00:00:00Z`,
+    timeMax: `${dayKey}T23:59:59Z`,
+    timeZone: tz,
+  });
+  const r = await fetch(
+    `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events?${params.toString()}`,
+    { headers: { 'Authorization': `Bearer ${accessToken}` } }
+  );
+  if (!r.ok) {
+    const t = await r.text().catch(() => '');
+    throw new Error(`Calendar list ${r.status}: ${t.slice(0, 200)}`);
+  }
+  const data = await r.json();
+  const items = Array.isArray(data.items) ? data.items : [];
+  const booked = [];
+  for (const ev of items) {
+    if (ev.status === 'cancelled') continue;
+    const dt = ev.start && ev.start.dateTime;
+    if (!dt) continue; // ganztägige Einträge ignorieren
+    if (dt.slice(0, 10) !== dayKey) continue;
+    const tag = ev.extendedProperties && ev.extendedProperties.private && ev.extendedProperties.private.staff;
+    // Mit Tag: nur für diesen Mitarbeiter sperren. Ohne Tag: für alle sperren.
+    if (staff && tag && tag !== staff) continue;
+    const m = dt.match(/T(\d{2}:\d{2})/);
+    if (m) booked.push(m[1]);
+  }
+  return booked;
 }
 
 // OAuth2 Access-Token für den Service-Account holen (JWT-Bearer-Flow, RS256-signiert).
