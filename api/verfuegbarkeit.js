@@ -1,4 +1,4 @@
-// Hundesalon Emika — Verfügbarkeit / belegte Uhrzeiten (Doppelbuchungs-Sperre)
+// Hundesalon Luna — Verfügbarkeit / belegte Uhrzeiten (Doppelbuchungs-Sperre)
 //
 // GET /api/verfuegbarkeit?day=YYYY-MM-DD&staff=<id>
 // Antwort: { booked: ["10:00","14:00"], configured: true }
