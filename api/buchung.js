@@ -1,4 +1,4 @@
-// Hundesalon Emika — Buchungsbestätigung per E-Mail (Resend) + Google-Kalender
+// Hundesalon Luna — Buchungsbestätigung per E-Mail (Resend) + Google-Kalender
 //
 // Serverless Function für Vercel / Netlify / Cloudflare Pages.
 // Wird aufgerufen wenn der Kunde im Formular "Anfrage senden" drückt.
@@ -11,7 +11,7 @@
 //
 // Voraussetzungen (Umgebungsvariablen im Hosting):
 //   RESEND_API_KEY        - API-Key aus resend.com Dashboard
-//   FROM_EMAIL            - Absender, z.B. "Hundesalon Emika <termine@hundesalon-emika.de>"
+//   FROM_EMAIL            - Absender, z.B. "Hundesalon Luna <termine@hundesalon-luna.de>"
 //                           (Domain muss in Resend verifiziert sein)
 //   OWNER_EMAIL           - E-Mail der Inhaberin für Notifications
 //
@@ -74,10 +74,10 @@ export default async function handler(req, res) {
   }[c]));
 
   // ── Kunden-Bestätigung ────────────────────────────────────────────────
-  const customerSubject = `Deine Terminanfrage bei Hundesalon Emika 🐾`;
+  const customerSubject = `Deine Terminanfrage bei Hundesalon Luna 🐾`;
   const customerHtml = renderEmail({
     title: `Hallo ${safe(firstName)},`,
-    intro: `danke für deine Terminanfrage bei <b>Hundesalon Emika</b>! Wir haben deine Anfrage erhalten und melden uns in Kürze persönlich zur finalen Bestätigung.`,
+    intro: `danke für deine Terminanfrage bei <b>Hundesalon Luna</b>! Wir haben deine Anfrage erhalten und melden uns in Kürze persönlich zur finalen Bestätigung.`,
     rows: [
       ['Für',         safe(dog)],
       ['Größe',       safe(size)],
@@ -86,16 +86,16 @@ export default async function handler(req, res) {
       ['Wunschtermin', `${safe(day)} um ${safe(time)} Uhr`],
       ['Richtpreis',  `ab ${safe(price)} €`],
     ],
-    outro: `Falls du Fragen hast oder etwas anpassen möchtest, antworte einfach auf diese E-Mail.<br><br>Wir freuen uns auf euch! 🐶<br>— Hundesalon Emika, Münster`,
+    outro: `Falls du Fragen hast oder etwas anpassen möchtest, antworte einfach auf diese E-Mail.<br><br>Wir freuen uns auf euch! 🐶<br>— Hundesalon Luna, Musterstadt`,
   });
   const customerText =
     `Hallo ${firstName},\n\n` +
-    `danke für deine Terminanfrage bei Hundesalon Emika. Wir haben deine Anfrage erhalten und melden uns in Kürze persönlich zur Bestätigung.\n\n` +
+    `danke für deine Terminanfrage bei Hundesalon Luna. Wir haben deine Anfrage erhalten und melden uns in Kürze persönlich zur Bestätigung.\n\n` +
     `Für: ${dog}\nGröße: ${size}\nLeistung: ${service}\n` +
     (staffName ? `Mitarbeiter: ${staffName}\n` : ``) +
     `Wunschtermin: ${day}, ${time} Uhr\nRichtpreis: ab ${price} €\n\n` +
     `Falls du Fragen hast, antworte einfach auf diese E-Mail.\n\n` +
-    `— Hundesalon Emika, Münster`;
+    `— Hundesalon Luna, Musterstadt`;
 
   // ── Inhaberin-Notification ────────────────────────────────────────────
   const ownerSubject = `🐾 Neue Terminanfrage: ${name} für ${dog}`;
@@ -332,14 +332,14 @@ function renderEmail({ title, intro, rows, outro }) {
 
   return `<!DOCTYPE html>
 <html lang="de">
-<head><meta charset="UTF-8"><title>Hundesalon Emika</title></head>
+<head><meta charset="UTF-8"><title>Hundesalon Luna</title></head>
 <body style="margin:0;padding:0;background:#FFF6FA;font-family:-apple-system,system-ui,'Segoe UI',sans-serif;color:#3C2A35">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#FFF6FA;padding:32px 16px">
     <tr><td align="center">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#FFFFFF;border-radius:20px;overflow:hidden;box-shadow:0 6px 24px rgba(60,30,50,.08)">
         <tr><td style="background:#FF5BA8;padding:24px 32px;color:#fff">
-          <div style="font-size:24px;font-weight:700">🐾 Hundesalon Emika</div>
-          <div style="font-size:13px;opacity:.9;margin-top:4px">Liebevolle Fellpflege · Münster</div>
+          <div style="font-size:24px;font-weight:700">🐾 Hundesalon Luna</div>
+          <div style="font-size:13px;opacity:.9;margin-top:4px">Liebevolle Fellpflege · Musterstadt</div>
         </td></tr>
         <tr><td style="padding:28px 32px">
           <h2 style="margin:0 0 12px;font-size:22px;color:#3C2A35">${title}</h2>
@@ -348,7 +348,7 @@ function renderEmail({ title, intro, rows, outro }) {
           <p style="margin:24px 0 0;font-size:14px;line-height:1.6;color:#90788A">${outro}</p>
         </td></tr>
         <tr><td style="background:#FFF0F7;padding:18px 32px;font-size:12px;color:#90788A;text-align:center">
-          Hundesalon Emika · An d. Alten Ziegelei 36A · 48157 Münster
+          Hundesalon Luna · Musterstraße 1 · 12345 Musterstadt
         </td></tr>
       </table>
     </td></tr>
