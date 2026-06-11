@@ -1227,7 +1227,7 @@ const PH = ({ children }) => <span className="placeholder">{children}</span>;
 function ImpressumContent() {
   return (
     <>
-      <h4>Angaben gemäß § 5 TMG</h4>
+      <h4>Angaben gemäß § 5 DDG</h4>
       <p>
         <PH>[Name der Inhaberin]</PH> – Hundesalon Luna<br />
         Musterstraße 1<br />
@@ -1251,17 +1251,15 @@ function ImpressumContent() {
       </p>
       <h4>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h4>
       <p><PH>[Name der Verantwortlichen]</PH>, Anschrift wie oben.</p>
-      <h4>EU-Streitschlichtung</h4>
+      <h4>Verbraucherstreitbeilegung</h4>
       <p className="muted">
-        Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit:
-        {" "}<a href="https://ec.europa.eu/consumers/odr/" target="_blank" rel="noopener noreferrer">https://ec.europa.eu/consumers/odr/</a><br />
         Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer
-        Verbraucherschlichtungsstelle teilzunehmen.
+        Verbraucherschlichtungsstelle teilzunehmen (§ 36 VSBG).
       </p>
       <h4>Haftung für Inhalte</h4>
       <p className="muted">
-        Als Diensteanbieter sind wir gemäß § 7 Abs. 1 TMG für eigene Inhalte auf diesen Seiten
-        nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir jedoch nicht
+        Als Diensteanbieter sind wir gemäß § 7 Abs. 1 DDG für eigene Inhalte auf diesen Seiten
+        nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 DDG sind wir jedoch nicht
         verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen.
       </p>
       <h4>Haftung für Links</h4>
@@ -1292,8 +1290,11 @@ function DatenschutzContent() {
 
       <h4>2. Allgemeine Informationen beim Besuch der Website</h4>
       <p className="muted">
-        Beim Aufruf dieser Website werden durch unseren Hosting-Provider technisch notwendige
-        Informationen automatisch erfasst:
+        Diese Website wird bei unserem Hosting-Dienstleister Vercel Inc. (340 S Lemon Ave #4133,
+        Walnut, CA 91789, USA) in einem Rechenzentrum in Frankfurt am Main (EU) betrieben. Mit
+        Vercel besteht ein Auftragsverarbeitungsvertrag (Art. 28 DSGVO); eine etwaige Datenübermittlung
+        in die USA ist über Standardvertragsklauseln (Art. 46 DSGVO) abgesichert. Beim Aufruf der
+        Website werden technisch notwendige Informationen automatisch erfasst:
       </p>
       <ul className="muted">
         <li>anonymisierte IP-Adresse</li>
