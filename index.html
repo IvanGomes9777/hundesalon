@@ -155,8 +155,11 @@ html[data-frame="eckig"] .frame{ border-radius:18px; }
 .chip small{ display:block; font-family:var(--font-body); font-weight:600; color:var(--muted); font-size:12px; }
 
 /* reveal on scroll */
-.reveal{ opacity:0; transform:translateY(34px); transition:opacity .7s var(--ease), transform .7s var(--ease); }
+.reveal{ opacity:0; transform:translateY(56px) scale(.95); transition:opacity .85s var(--ease), transform .85s var(--ease); will-change:opacity, transform; }
 .reveal.in{ opacity:1; transform:none; }
+@media (prefers-reduced-motion: reduce){
+  .reveal{ opacity:1 !important; transform:none !important; transition:none !important; }
+}
 
 /* ============================ NAV ============================ */
 header.nav{
@@ -300,6 +303,10 @@ html[data-hero="zentriert"] .hero .lead{ margin-left:auto; margin-right:auto; }
 .rev-name{ font-family:var(--font-display); font-weight:600; }
 .rev-meta small{ color:var(--muted); }
 .rev-quote{ position:absolute; top:18px; right:26px; font-family:var(--font-display); font-size:64px; color:var(--c1-soft); line-height:1; }
+.rev-rating{ margin-top:14px; font-size:17px; color:var(--muted); letter-spacing:.5px; }
+.rev-rating b{ color:var(--accent); font-family:var(--font-display); font-size:20px; }
+.rev-cta{ text-align:center; margin-top:44px; display:flex; flex-direction:column; align-items:center; gap:18px; }
+.rev-cta p{ font-size:17px; color:var(--ink); max-width:46ch; }
 
 /* ============================ TEAM ============================ */
 .team{ padding:80px 0; background:var(--surface-2); }
@@ -311,6 +318,10 @@ html[data-hero="zentriert"] .hero .lead{ margin-left:auto; margin-right:auto; }
 .team-card h3{ font-size:20px; }
 .team-role{ color:var(--c1-600); font-weight:700; font-family:var(--font-display); font-size:14px; }
 .team-card p{ color:var(--muted); font-size:14.5px; margin-top:8px; }
+.meet-grid{ align-items:center; }
+.meet-photo{ width:100%; max-width:420px; margin:0 auto; }
+.meet-photo .framed{ aspect-ratio:1/1.15; }
+.meet-cta{ display:flex; gap:14px; flex-wrap:wrap; margin-top:28px; }
 
 /* ============================ BOOKING ============================ */
 .booking{ padding:80px 0; }
@@ -1756,7 +1767,7 @@ function Nav() {
   const [open, setOpen] = useState(false);
   const links = [
     ["Über uns", "ueber"], ["Leistungen", "leistungen"], ["Galerie", "galerie"],
-    ["Bewertungen", "bewertungen"], ["Team", "team"], ["FAQ", "faq"], ["Kontakt", "kontakt"],
+    ["Bewertungen", "bewertungen"], ["Über Katja", "team"], ["FAQ", "faq"], ["Kontakt", "kontakt"],
   ];
   return (
     <React.Fragment>
@@ -1853,7 +1864,7 @@ function About() {
           <div className="sign">
             <div className="sign-avatar"><image-slot id="about-owner" shape="circle" placeholder="Foto"></image-slot></div>
             <div>
-              <div className="sign-name">Katja &amp; Team</div>
+              <div className="sign-name">Katja</div>
               <small>Inhaberin · gepr. Hundefriseurin</small>
             </div>
           </div>
@@ -1992,6 +2003,7 @@ function Reviews() {
         <Reveal className="sec-head">
           <span className="eyebrow kicker"><Paw /> Bewertungen</span>
           <h2 style={{ marginTop: 14 }}>Das sagen Frauchen &amp; Herrchen</h2>
+          <p className="rev-rating"><b>5,0</b> ★★★★★ · 23 Google-Bewertungen</p>
         </Reveal>
         <div className="rev-grid">
           {data.map(([q, n, s, st], i) => (
@@ -2010,35 +2022,36 @@ function Reviews() {
             </Reveal>
           ))}
         </div>
+        <Reveal className="rev-cta">
+          <p>Schon bei uns gewesen? Wir freuen uns riesig über deine Bewertung! 🐾</p>
+          <a className="btn btn-primary btn-lg" href="https://share.google/YQLO5Wqlj5reu3W4J" target="_blank" rel="noopener noreferrer">
+            <Paw /> Eigene Bewertung schreiben
+          </a>
+        </Reveal>
       </div>
     </section>
   );
 }
 
 function Team() {
-  const team = [
-    ["Katja", "Inhaberin & Hundefriseurin", "Pflegt jeden Hund mit Geduld & Herz.", "https://i.pravatar.cc/500?img=47"],
-    ["Jana",  "Groomerin",              "Spezialistin für Schur & Trimmen.", "https://i.pravatar.cc/500?img=44"],
-    ["Mira",  "Groomerin",              "Geduldsprofi für ängstliche Hunde.", "https://i.pravatar.cc/500?img=49"],
-    ["Tom",   "Bade- & Wellness",       "Sorgt für glänzendes Fell.", "https://i.pravatar.cc/500?img=12"],
-  ];
   return (
     <section className="team" id="team">
-      <div className="wrap">
-        <Reveal className="sec-head">
-          <span className="eyebrow kicker"><Paw /> Unser Team</span>
-          <h2 style={{ marginTop: 14 }}>Die Hände hinter dem Wohlfühl-Grooming</h2>
+      <div className="wrap about-grid meet-grid">
+        <Reveal className="meet-photo">
+          <FramedImage id="meet-katja" src="https://i.pravatar.cc/600?img=47" tilt
+                       placeholder="Foto von Katja" ratio="1/1.15" decoColor="var(--c1-soft)" />
         </Reveal>
-        <div className="team-grid">
-          {team.map(([n, r, d, src], i) => (
-            <Reveal key={n} delay={i * 80} className="team-card">
-              <FramedImage id={`team-${i}`} src={src} tilt placeholder={`${n} · Foto`} ratio="1/1.15" />
-              <h3>{n}</h3>
-              <div className="team-role">{r}</div>
-              <p>{d}</p>
-            </Reveal>
-          ))}
-        </div>
+        <Reveal delay={120}>
+          <span className="eyebrow"><Paw /> Über mich</span>
+          <h2>Hallo, ich bin Katja 🐾</h2>
+          <p>Ich bin geprüfte Hundefriseurin und führe den Hundesalon Emika in Münster-Ost ganz persönlich. Mein Salon ist modern und sauber — damit dein Hund in einer sicheren, ruhigen Umgebung gepflegt wird.</p>
+          <p>Mein Ziel ist es, deinem Hund eine angenehme Erfahrung zu bieten und ihn mit einem frischen Look nach Hause zu schicken. Mir ist wichtig, dass du als Besitzer:in mit meiner Arbeit zufrieden bist und dich auf mich verlassen kannst.</p>
+          <p>Du suchst eine professionelle, liebevolle Fellpflege? Dann bist du bei mir genau richtig — ich freue mich auf dich und deinen Liebling!</p>
+          <div className="meet-cta">
+            <button className="btn btn-primary" onClick={() => goTo("buchen")}><Paw /> Termin buchen</button>
+            <a className="btn btn-ghost" href="tel:+491788179912">☎ 0178 8179912</a>
+          </div>
+        </Reveal>
       </div>
     </section>
   );
@@ -2135,7 +2148,7 @@ function Footer() {
           <h4>Salon</h4>
           <a href="#ueber" onClick={(e) => { e.preventDefault(); goTo("ueber"); }}>Über uns</a>
           <a href="#leistungen" onClick={(e) => { e.preventDefault(); goTo("leistungen"); }}>Leistungen</a>
-          <a href="#team" onClick={(e) => { e.preventDefault(); goTo("team"); }}>Team</a>
+          <a href="#team" onClick={(e) => { e.preventDefault(); goTo("team"); }}>Über Katja</a>
           <a href="#galerie" onClick={(e) => { e.preventDefault(); goTo("galerie"); }}>Galerie</a>
         </div>
         <div className="foot-col">
@@ -2176,11 +2189,9 @@ const SERVICES = [
   { id: "schur", label: "Schur / Trimmen", sub: "Fellschnitt nach Rasse" },
   { id: "unterwolle", label: "Unterwoll-Kur", sub: "Entfilzen & Entwollen" },
 ];
+// Ein-Personen-Salon: alle Termine laufen bei Katja.
 const STAFF = [
   { id: "katja", name: "Katja", role: "Inhaberin & Hundefriseurin" },
-  { id: "jana", name: "Jana", role: "Groomerin" },
-  { id: "mira", name: "Mira", role: "Groomerin" },
-  { id: "tom", name: "Tom", role: "Bade & Wellness" },
 ];
 const TIMES = ["11:00", "12:00", "13:00", "14:00", "15:00", "16:00"];
 // Öffnungszeiten je Wochentag (0=So … 6=Sa): [erste, letzte] buchbare Startzeit.
@@ -2246,7 +2257,7 @@ function Booking() {
   const [step, setStep] = useState(0);
   const [size, setSize] = useState(null);
   const [service, setService] = useState(null);
-  const [staff, setStaff] = useState(null);
+  const [staff, setStaff] = useState("katja"); // Ein-Personen-Salon: fest auf Katja
   const [day, setDay] = useState(null);
   const [time, setTime] = useState(null);
   const [booked, setBooked] = useState([]);       // belegte Uhrzeiten (HH:MM) für gewählten Tag + Mitarbeiter
@@ -2315,7 +2326,7 @@ function Booking() {
   }
 
   function next() {
-    if (step === 0 && (!size || !service || !staff)) return;
+    if (step === 0 && (!size || !service)) return;
     if (step === 1 && (!day || !time)) return;
     if (step === 2) {
       if (!validateContact()) return;
@@ -2393,15 +2404,6 @@ function Booking() {
                 </div>
               ))}
             </div>
-            <p style={{ color: "var(--muted)", margin: "20px 0 10px" }}>Bei wem möchtest du buchen?</p>
-            <div className="opt-grid">
-              {STAFF.map(s => (
-                <div key={s.id} className={`opt ${staff === s.id ? "sel" : ""}`}
-                     onClick={() => { setStaff(s.id); setTime(null); }}>
-                  <b>{s.name}</b><small>{s.role}</small>
-                </div>
-              ))}
-            </div>
           </div>
         )}
 
@@ -2411,7 +2413,7 @@ function Booking() {
             <p style={{ color: "var(--muted)", marginBottom: 16 }}>Wähle einen freien Tag. (Geöffnet Mi–Sa, 11–17 Uhr)</p>
             <Calendar value={day} onSelect={(k) => { setDay(k); setTime(null); }} />
             <p style={{ color: "var(--muted)", margin: "22px 0 12px" }}>
-              Freie Uhrzeiten{staffObj ? ` bei ${staffObj.name}` : ""}{dayObj ? ` am ${dayObj.full}` : ""}
+              Freie Uhrzeiten{dayObj ? ` am ${dayObj.full}` : ""}
               {loadingSlots && <span style={{ marginLeft: 8, fontSize: 13 }}>· lädt …</span>}
             </p>
             <div className="slots">
