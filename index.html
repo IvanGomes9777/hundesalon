@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Hundesalon Luna — Liebevolle Fellpflege in Musterstadt</title>
+<title>Hundesalon Emika — Liebevolle Fellpflege in Münster</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23FF5BA8'/%3E%3Cg fill='%23fff'%3E%3Cellipse cx='50' cy='64' rx='20' ry='16'/%3E%3Ccircle cx='30' cy='42' r='8.5'/%3E%3Ccircle cx='45' cy='30' r='9'/%3E%3Ccircle cx='60' cy='31' r='9'/%3E%3Ccircle cx='73' cy='46' r='7.5'/%3E%3C/g%3E%3C/svg%3E" />
 <meta name="theme-color" content="#FF5BA8" />
-<meta name="description" content="Hundesalon Luna — Liebevolle Fellpflege für deinen Hund in Musterstadt. Professionelles Grooming, faire Preise, ruhig und stressfrei." />
+<meta name="description" content="Hundesalon Emika — Liebevolle Fellpflege für deinen Hund in Münster. Professionelles Grooming, faire Preise, ruhig und stressfrei." />
 <link rel="preconnect" href="https://fonts.bunny.net" crossorigin />
 <link href="https://fonts.bunny.net/css?family=fredoka:400,500,600,700|baloo-2:400,500,600,700|quicksand:500,600,700|nunito:400,500,600,700&display=swap" rel="stylesheet" />
 <style>
@@ -155,8 +155,11 @@ html[data-frame="eckig"] .frame{ border-radius:18px; }
 .chip small{ display:block; font-family:var(--font-body); font-weight:600; color:var(--muted); font-size:12px; }
 
 /* reveal on scroll */
-.reveal{ opacity:0; transform:translateY(34px); transition:opacity .7s var(--ease), transform .7s var(--ease); }
+.reveal{ opacity:0; transform:translateY(56px) scale(.95); transition:opacity .85s var(--ease), transform .85s var(--ease); will-change:opacity, transform; }
 .reveal.in{ opacity:1; transform:none; }
+@media (prefers-reduced-motion: reduce){
+  .reveal{ opacity:1 !important; transform:none !important; transition:none !important; }
+}
 
 /* ============================ NAV ============================ */
 header.nav{
@@ -300,6 +303,10 @@ html[data-hero="zentriert"] .hero .lead{ margin-left:auto; margin-right:auto; }
 .rev-name{ font-family:var(--font-display); font-weight:600; }
 .rev-meta small{ color:var(--muted); }
 .rev-quote{ position:absolute; top:18px; right:26px; font-family:var(--font-display); font-size:64px; color:var(--c1-soft); line-height:1; }
+.rev-rating{ margin-top:14px; font-size:17px; color:var(--muted); letter-spacing:.5px; }
+.rev-rating b{ color:var(--accent); font-family:var(--font-display); font-size:20px; }
+.rev-cta{ text-align:center; margin-top:44px; display:flex; flex-direction:column; align-items:center; gap:18px; }
+.rev-cta p{ font-size:17px; color:var(--ink); max-width:46ch; }
 
 /* ============================ TEAM ============================ */
 .team{ padding:80px 0; background:var(--surface-2); }
@@ -311,6 +318,10 @@ html[data-hero="zentriert"] .hero .lead{ margin-left:auto; margin-right:auto; }
 .team-card h3{ font-size:20px; }
 .team-role{ color:var(--c1-600); font-weight:700; font-family:var(--font-display); font-size:14px; }
 .team-card p{ color:var(--muted); font-size:14.5px; margin-top:8px; }
+.meet-grid{ align-items:center; }
+.meet-photo{ width:100%; max-width:420px; margin:0 auto; }
+.meet-photo .framed{ aspect-ratio:1/1.15; }
+.meet-cta{ display:flex; gap:14px; flex-wrap:wrap; margin-top:28px; }
 
 /* ============================ BOOKING ============================ */
 .booking{ padding:80px 0; }
@@ -1176,8 +1187,8 @@ function MapEmbed() {
   if (loaded) {
     return (
       <iframe
-        title="Hundesalon Luna auf Google Maps"
-        src="https://www.google.com/maps?q=Musterstra%C3%9Fe+1,+12345+Musterstadt&output=embed&z=12&hl=de"
+        title="Hundesalon Emika auf Google Maps"
+        src="https://www.google.com/maps?q=An+der+Alten+Ziegelei+36A,+48157+M%C3%BCnster&output=embed&z=16&hl=de"
         style={{ width: "100%", height: "100%", minHeight: 340, border: 0, display: "block" }}
         loading="lazy"
         referrerPolicy="no-referrer-when-downgrade"
@@ -1229,9 +1240,9 @@ function ImpressumContent() {
     <>
       <h4>Angaben gemäß § 5 DDG</h4>
       <p>
-        <PH>[Name der Inhaberin]</PH> – Hundesalon Luna<br />
-        Musterstraße 1<br />
-        12345 Musterstadt
+        <PH>[Name der Inhaberin]</PH> – Hundesalon Emika<br />
+        An d. Alten Ziegelei 36A<br />
+        48157 Münster
       </p>
       <h4>Kontakt</h4>
       <p>
@@ -1247,7 +1258,7 @@ function ImpressumContent() {
       <p className="muted">
         Berufsbezeichnung: Hundefriseurin / Groomerin<br />
         Verliehen in: Deutschland<br />
-        Zuständige Kammer: <PH>[Falls eingetragen, z. B. Handwerkskammer Musterstadt]</PH>
+        Zuständige Kammer: <PH>[Falls eingetragen, z. B. Handwerkskammer Münster]</PH>
       </p>
       <h4>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h4>
       <p><PH>[Name der Verantwortlichen]</PH>, Anschrift wie oben.</p>
@@ -1283,8 +1294,8 @@ function DatenschutzContent() {
     <>
       <h4>1. Verantwortliche Stelle</h4>
       <p>
-        <PH>[Name der Inhaberin]</PH> – Hundesalon Luna<br />
-        Musterstraße 1, 12345 Musterstadt<br />
+        <PH>[Name der Inhaberin]</PH> – Hundesalon Emika<br />
+        An d. Alten Ziegelei 36A, 48157 Münster<br />
         Telefon: <PH>[Telefonnummer]</PH> · E-Mail: <PH>[E-Mail]</PH>
       </p>
 
@@ -1756,14 +1767,14 @@ function Nav() {
   const [open, setOpen] = useState(false);
   const links = [
     ["Über uns", "ueber"], ["Leistungen", "leistungen"], ["Galerie", "galerie"],
-    ["Bewertungen", "bewertungen"], ["Team", "team"], ["FAQ", "faq"], ["Kontakt", "kontakt"],
+    ["Bewertungen", "bewertungen"], ["Über Katja", "team"], ["FAQ", "faq"], ["Kontakt", "kontakt"],
   ];
   return (
     <React.Fragment>
       <header className="nav">
         <div className="wrap nav-inner">
           <a className="logo" href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
-            <Paw /> <span>Luna<b>.</b></span>
+            <Paw /> <span>Emika<b>.</b></span>
           </a>
           <nav className="nav-links">
             {links.map(([l, id]) => (
@@ -1796,13 +1807,13 @@ function Hero() {
       <div className="wrap hero-grid">
         <div>
           <Reveal>
-            <span className="eyebrow hero-eyebrow"><Paw /> Hundesalon in Musterstadt · Musterstraße</span>
+            <span className="eyebrow hero-eyebrow"><Paw /> Hundesalon in Münster-Ost · An der Alten Ziegelei</span>
           </Reveal>
           <Reveal delay={80}>
             <h1>Liebevolle Fellpflege für <span className="hl">deinen Liebling</span> 🐾</h1>
           </Reveal>
           <Reveal delay={160}>
-            <p className="lead">Professionelles Grooming, das deinem Hund guttut — ruhig, gründlich und mit ganz viel Herz. Mitten in Musterstadt.</p>
+            <p className="lead">Professionelles Grooming, das deinem Hund guttut — ruhig, gründlich und mit ganz viel Herz. Mitten in Münster.</p>
           </Reveal>
           <Reveal delay={240}>
             <div className="hero-cta">
@@ -1848,12 +1859,12 @@ function About() {
         <Reveal delay={120}>
           <span className="eyebrow"><Paw /> Über uns</span>
           <h2>Ein Salon, in dem sich dein Hund wirklich wohlfühlt</h2>
-          <p>Hundesalon <span className="em">Luna</span> ist dein liebevoller Grooming-Salon im Herzen von Musterstadt. Wir nehmen uns Zeit für jedes Tier — ohne Hektik, ohne Stress.</p>
-          <p>Ob flauschiger Welpe oder ruhiger Senior: Wir arbeiten mit <span className="em">hautfreundlichen Produkten</span> und viel Geduld, damit dein Hund nicht nur top aussieht, sondern sich auch rundum wohlfühlt.</p>
+          <p>Hundesalon <span className="em">Emika</span> ist dein liebevoller Grooming-Salon in <span className="em">Münster-Ost</span>, an der Alten Ziegelei. Inhaberin <span className="em">Katja</span> ist gepr. Hundefriseurin und nimmt sich Zeit für jedes Tier — ohne Hektik, ohne Stress.</p>
+          <p>Vom Baden &amp; Föhnen über Komplettpflege und Styling bis zu Krallenschnitt und Ohrenreinigung: Ob Großrasse oder kleiner Begleiter, ob ängstlicher Welpe oder ruhiger Senior — wir arbeiten mit <span className="em">hautfreundlichen Produkten</span> und viel Geduld. Termine gern online oder telefonisch — spontan auch <span className="em">ohne Termin</span> möglich.</p>
           <div className="sign">
             <div className="sign-avatar"><image-slot id="about-owner" shape="circle" placeholder="Foto"></image-slot></div>
             <div>
-              <div className="sign-name">Luna &amp; Team</div>
+              <div className="sign-name">Katja</div>
               <small>Inhaberin · gepr. Hundefriseurin</small>
             </div>
           </div>
@@ -1936,13 +1947,13 @@ function Why() {
     ["Stressfrei & geduldig", "Wir nehmen uns Zeit und gehen einfühlsam auf jeden Hund ein — auch auf die ängstlichen.", "var(--c1-100)", "var(--c1-600)"],
     ["Geprüfte Profis", "Ausgebildete Hundefriseure mit jahrelanger Erfahrung und echter Tierliebe.", "var(--c2-100)", "var(--c2-600)"],
     ["Schonende Pflege", "Hochwertige, hautfreundliche Produkte — abgestimmt auf Fell und Hauttyp.", "var(--c1-100)", "var(--c1-600)"],
-    ["Mitten in Musterstadt", "Zentral gelegen mit Parkmöglichkeit direkt vor der Tür.", "var(--c2-100)", "var(--c2-600)"],
+    ["Mitten in Münster", "Zentral gelegen mit Parkmöglichkeit direkt vor der Tür.", "var(--c2-100)", "var(--c2-600)"],
   ];
   return (
     <section className="why">
       <div className="wrap">
         <Reveal className="sec-head">
-          <span className="eyebrow kicker"><Paw /> Warum Luna</span>
+          <span className="eyebrow kicker"><Paw /> Warum Emika</span>
           <h2 style={{ marginTop: 14 }}>Darum vertrauen uns Hundebesitzer</h2>
         </Reveal>
         <div className="why-grid">
@@ -1966,7 +1977,7 @@ function Gallery() {
       <div className="wrap">
         <Reveal className="sec-head">
           <span className="eyebrow kicker"><Paw /> Galerie</span>
-          <h2 style={{ marginTop: 14 }}>Frisch gestylt bei Luna</h2>
+          <h2 style={{ marginTop: 14 }}>Frisch gestylt bei Emika</h2>
         </Reveal>
         <Reveal className="gal-grid">
           {[1, 2, 3, 4].map(i => (
@@ -1992,6 +2003,7 @@ function Reviews() {
         <Reveal className="sec-head">
           <span className="eyebrow kicker"><Paw /> Bewertungen</span>
           <h2 style={{ marginTop: 14 }}>Das sagen Frauchen &amp; Herrchen</h2>
+          <p className="rev-rating"><b>5,0</b> ★★★★★ · 23 Google-Bewertungen</p>
         </Reveal>
         <div className="rev-grid">
           {data.map(([q, n, s, st], i) => (
@@ -2010,35 +2022,36 @@ function Reviews() {
             </Reveal>
           ))}
         </div>
+        <Reveal className="rev-cta">
+          <p>Schon bei uns gewesen? Wir freuen uns riesig über deine Bewertung! 🐾</p>
+          <a className="btn btn-primary btn-lg" href="https://share.google/YQLO5Wqlj5reu3W4J" target="_blank" rel="noopener noreferrer">
+            <Paw /> Eigene Bewertung schreiben
+          </a>
+        </Reveal>
       </div>
     </section>
   );
 }
 
 function Team() {
-  const team = [
-    ["Luna", "Inhaberin & Hundefriseurin", "Liebt Rassen mit Charakter.", "https://i.pravatar.cc/500?img=47"],
-    ["Jana",  "Groomerin",              "Spezialistin für Schur & Trimmen.", "https://i.pravatar.cc/500?img=44"],
-    ["Mira",  "Groomerin",              "Geduldsprofi für ängstliche Hunde.", "https://i.pravatar.cc/500?img=49"],
-    ["Tom",   "Bade- & Wellness",       "Sorgt für glänzendes Fell.", "https://i.pravatar.cc/500?img=12"],
-  ];
   return (
     <section className="team" id="team">
-      <div className="wrap">
-        <Reveal className="sec-head">
-          <span className="eyebrow kicker"><Paw /> Unser Team</span>
-          <h2 style={{ marginTop: 14 }}>Die Hände hinter dem Wohlfühl-Grooming</h2>
+      <div className="wrap about-grid meet-grid">
+        <Reveal className="meet-photo">
+          <FramedImage id="meet-katja" src="https://i.pravatar.cc/600?img=47" tilt
+                       placeholder="Foto von Katja" ratio="1/1.15" decoColor="var(--c1-soft)" />
         </Reveal>
-        <div className="team-grid">
-          {team.map(([n, r, d, src], i) => (
-            <Reveal key={n} delay={i * 80} className="team-card">
-              <FramedImage id={`team-${i}`} src={src} tilt placeholder={`${n} · Foto`} ratio="1/1.15" />
-              <h3>{n}</h3>
-              <div className="team-role">{r}</div>
-              <p>{d}</p>
-            </Reveal>
-          ))}
-        </div>
+        <Reveal delay={120}>
+          <span className="eyebrow"><Paw /> Über mich</span>
+          <h2>Hallo, ich bin Katja 🐾</h2>
+          <p>Ich bin geprüfte Hundefriseurin und führe den Hundesalon Emika in Münster-Ost ganz persönlich. Mein Salon ist modern und sauber — damit dein Hund in einer sicheren, ruhigen Umgebung gepflegt wird.</p>
+          <p>Mein Ziel ist es, deinem Hund eine angenehme Erfahrung zu bieten und ihn mit einem frischen Look nach Hause zu schicken. Mir ist wichtig, dass du als Besitzer:in mit meiner Arbeit zufrieden bist und dich auf mich verlassen kannst.</p>
+          <p>Du suchst eine professionelle, liebevolle Fellpflege? Dann bist du bei mir genau richtig — ich freue mich auf dich und deinen Liebling!</p>
+          <div className="meet-cta">
+            <button className="btn btn-primary" onClick={() => goTo("buchen")}><Paw /> Termin buchen</button>
+            <a className="btn btn-ghost" href="tel:+491788179912">☎ 0178 8179912</a>
+          </div>
+        </Reveal>
       </div>
     </section>
   );
@@ -2081,27 +2094,27 @@ function FAQ() {
 }
 
 function Contact() {
-  const hours = [["Montag", "09:00 – 18:00"], ["Dienstag", "09:00 – 18:00"], ["Mittwoch", "09:00 – 18:00"], ["Donnerstag", "09:00 – 18:00"], ["Freitag", "09:00 – 18:00"], ["Samstag", "09:00 – 14:00"], ["Sonntag", "Geschlossen", true]];
+  const hours = [["Montag", "Geschlossen", true], ["Dienstag", "Geschlossen", true], ["Mittwoch", "11:00 – 17:00"], ["Donnerstag", "11:00 – 17:00"], ["Freitag", "11:00 – 17:00"], ["Samstag", "11:00 – 17:00"], ["Sonntag", "Geschlossen", true]];
   return (
     <section className="contact" id="kontakt">
       <div className="wrap">
         <Reveal className="sec-head">
           <span className="eyebrow kicker"><Paw /> Kontakt</span>
-          <h2 style={{ marginTop: 14 }}>Komm vorbei in Musterstadt</h2>
+          <h2 style={{ marginTop: 14 }}>Komm vorbei in Münster</h2>
         </Reveal>
         <div className="contact-grid">
           <Reveal className="contact-card">
             <div className="info-row">
               <div className="info-ico"><Paw style={{ width: 22, height: 22 }} /></div>
-              <div><b>Adresse</b><small>Musterstraße 1<br />12345 Musterstadt</small></div>
+              <div><b>Adresse</b><small>An d. Alten Ziegelei 36A<br />48157 Münster-Ost</small></div>
             </div>
             <div className="info-row">
               <div className="info-ico">☎</div>
-              <div><b>Telefon</b><small>01234 / 567 890</small></div>
+              <div><b>Telefon</b><small>0178 8179912</small></div>
             </div>
             <div className="info-row">
               <div className="info-ico">✉</div>
-              <div><b>E-Mail</b><small>hallo@hundesalon-luna.de</small></div>
+              <div><b>E-Mail</b><small>hallo@hundesalon-emika.de</small></div>
             </div>
             <h3 style={{ fontSize: 20, margin: "22px 0 8px" }}>Öffnungszeiten</h3>
             {hours.map(([d, h, c]) => (
@@ -2123,8 +2136,8 @@ function Footer() {
     <footer>
       <div className="wrap foot-grid">
         <div>
-          <div className="logo"><Paw /> <span>Luna<b>.</b></span></div>
-          <p style={{ marginTop: 16, maxWidth: "28ch" }}>Liebevolle Fellpflege für deinen Hund — mitten in Musterstadt.</p>
+          <div className="logo"><Paw /> <span>Emika<b>.</b></span></div>
+          <p style={{ marginTop: 16, maxWidth: "28ch" }}>Liebevolle Fellpflege für deinen Hund — mitten in Münster.</p>
           <div className="socials">
             <a href="#" aria-label="Instagram">◎</a>
             <a href="#" aria-label="Facebook">f</a>
@@ -2135,7 +2148,7 @@ function Footer() {
           <h4>Salon</h4>
           <a href="#ueber" onClick={(e) => { e.preventDefault(); goTo("ueber"); }}>Über uns</a>
           <a href="#leistungen" onClick={(e) => { e.preventDefault(); goTo("leistungen"); }}>Leistungen</a>
-          <a href="#team" onClick={(e) => { e.preventDefault(); goTo("team"); }}>Team</a>
+          <a href="#team" onClick={(e) => { e.preventDefault(); goTo("team"); }}>Über Katja</a>
           <a href="#galerie" onClick={(e) => { e.preventDefault(); goTo("galerie"); }}>Galerie</a>
         </div>
         <div className="foot-col">
@@ -2146,13 +2159,13 @@ function Footer() {
         </div>
         <div className="foot-col">
           <h4>Kontakt</h4>
-          <p>Musterstraße 1<br />12345 Musterstadt</p>
-          <p>01234 / 567 890</p>
-          <p>hallo@hundesalon-luna.de</p>
+          <p>An d. Alten Ziegelei 36A<br />48157 Münster-Ost</p>
+          <p>0178 8179912</p>
+          <p>hallo@hundesalon-emika.de</p>
         </div>
       </div>
       <div className="wrap foot-bottom">
-        <span>© 2026 Hundesalon Luna · Musterstadt</span>
+        <span>© 2026 Hundesalon Emika · Münster</span>
         <div className="foot-legal">
           <button onClick={() => window.dispatchEvent(new CustomEvent("open-legal", { detail: "impressum" }))}>Impressum</button>
           <button onClick={() => window.dispatchEvent(new CustomEvent("open-legal", { detail: "datenschutz" }))}>Datenschutz</button>
@@ -2176,15 +2189,14 @@ const SERVICES = [
   { id: "schur", label: "Schur / Trimmen", sub: "Fellschnitt nach Rasse" },
   { id: "unterwolle", label: "Unterwoll-Kur", sub: "Entfilzen & Entwollen" },
 ];
+// Ein-Personen-Salon: alle Termine laufen bei Katja.
 const STAFF = [
-  { id: "luna", name: "Luna", role: "Inhaberin & Hundefriseurin" },
-  { id: "jana", name: "Jana", role: "Groomerin" },
-  { id: "mira", name: "Mira", role: "Groomerin" },
-  { id: "tom", name: "Tom", role: "Bade & Wellness" },
+  { id: "katja", name: "Katja", role: "Inhaberin & Hundefriseurin" },
 ];
-const TIMES = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
-// Späteste buchbare Startzeit je Wochentag (0=So … 6=Sa). Salon schließt Mo–Fr 18 Uhr, Sa 14 Uhr.
-const LAST_SLOT = { 1: 17, 2: 17, 3: 17, 4: 17, 5: 17, 6: 13 };
+const TIMES = ["11:00", "12:00", "13:00", "14:00", "15:00", "16:00"];
+// Öffnungszeiten je Wochentag (0=So … 6=Sa): [erste, letzte] buchbare Startzeit.
+// Salon geöffnet Mi–Sa 11–17 Uhr (letzter Termin 16 Uhr). Mo/Di/So geschlossen.
+const OPEN = { 3: [11, 16], 4: [11, 16], 5: [11, 16], 6: [11, 16] };
 const DOW = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
 const MON = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
 
@@ -2227,7 +2239,7 @@ function Calendar({ value, onSelect }) {
         {cells.map((dt, i) => {
           if (!dt) return <div key={"e" + i} className="cal-cell empty" aria-hidden="true"></div>;
           const key = isoKey(dt);
-          const disabled = dt.getDay() === 0 || dt < today; // Sonntag geschlossen + Vergangenheit
+          const disabled = !OPEN[dt.getDay()] || dt < today; // nur Mi–Sa buchbar + keine Vergangenheit
           const isToday = dt.getTime() === today.getTime();
           return (
             <button type="button" key={key} disabled={disabled}
@@ -2245,7 +2257,7 @@ function Booking() {
   const [step, setStep] = useState(0);
   const [size, setSize] = useState(null);
   const [service, setService] = useState(null);
-  const [staff, setStaff] = useState(null);
+  const [staff, setStaff] = useState("katja"); // Ein-Personen-Salon: fest auf Katja
   const [day, setDay] = useState(null);
   const [time, setTime] = useState(null);
   const [booked, setBooked] = useState([]);       // belegte Uhrzeiten (HH:MM) für gewählten Tag + Mitarbeiter
@@ -2314,7 +2326,7 @@ function Booking() {
   }
 
   function next() {
-    if (step === 0 && (!size || !service || !staff)) return;
+    if (step === 0 && (!size || !service)) return;
     if (step === 1 && (!day || !time)) return;
     if (step === 2) {
       if (!validateContact()) return;
@@ -2392,43 +2404,30 @@ function Booking() {
                 </div>
               ))}
             </div>
-            <p style={{ color: "var(--muted)", margin: "20px 0 10px" }}>Bei wem möchtest du buchen?</p>
-            <div className="opt-grid">
-              {STAFF.map(s => (
-                <div key={s.id} className={`opt ${staff === s.id ? "sel" : ""}`}
-                     onClick={() => { setStaff(s.id); setTime(null); }}>
-                  <b>{s.name}</b><small>{s.role}</small>
-                </div>
-              ))}
-            </div>
           </div>
         )}
 
         {step === 1 && (
           <div>
             <h3 style={{ fontSize: 22, marginBottom: 4 }}>2. Datum & Uhrzeit</h3>
-            <p style={{ color: "var(--muted)", marginBottom: 16 }}>Wähle einen freien Tag. (Sonntags geschlossen)</p>
+            <p style={{ color: "var(--muted)", marginBottom: 16 }}>Wähle einen freien Tag. (Geöffnet Mi–Sa, 11–17 Uhr)</p>
             <Calendar value={day} onSelect={(k) => { setDay(k); setTime(null); }} />
             <p style={{ color: "var(--muted)", margin: "22px 0 12px" }}>
-              Freie Uhrzeiten{staffObj ? ` bei ${staffObj.name}` : ""}{dayObj ? ` am ${dayObj.full}` : ""}
+              Freie Uhrzeiten{dayObj ? ` am ${dayObj.full}` : ""}
               {loadingSlots && <span style={{ marginLeft: 8, fontSize: 13 }}>· lädt …</span>}
             </p>
-            {day && weekday === 6 && (
-              <p style={{ color: "var(--c1-600)", fontWeight: 600, fontSize: 14, marginBottom: 12 }}>
-                Samstags schließen wir um 14 Uhr – letzter Termin um 13 Uhr.
-              </p>
-            )}
             <div className="slots">
               {TIMES.map((t) => {
                 const hour = parseInt(t, 10);
-                const off = !day || hour > LAST_SLOT[weekday] || booked.includes(t);
+                const open = OPEN[weekday];
+                const off = !day || !open || hour < open[0] || hour > open[1] || booked.includes(t);
                 return (
                   <div key={t} className={`slot ${time === t ? "sel" : ""} ${off ? "off" : ""}`}
                        onClick={() => { if (!off) setTime(t); }}>{t}</div>
                 );
               })}
             </div>
-            {day && !loadingSlots && TIMES.every(t => parseInt(t, 10) > LAST_SLOT[weekday] || booked.includes(t)) && (
+            {day && !loadingSlots && TIMES.every(t => { const h = parseInt(t, 10); const open = OPEN[weekday]; return !open || h < open[0] || h > open[1] || booked.includes(t); }) && (
               <p style={{ color: "var(--muted)", fontSize: 14, marginTop: 12 }}>
                 An diesem Tag ist {staffObj ? staffObj.name : "der/die Mitarbeiter:in"} leider ausgebucht – bitte wähle einen anderen Tag.
               </p>
