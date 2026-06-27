@@ -1,4 +1,4 @@
-# 🐾 Go-Live-Checkliste — Hundesalon Emika
+# 🐾 Go-Live-Checkliste — Hundesalon Luna
 
 Alle offenen Punkte, die noch erledigt werden müssen, bevor die Seite wirklich
 online geht. Abhaken, sobald erledigt.
@@ -28,10 +28,10 @@ online geht. Abhaken, sobald erledigt.
 
 ## 2. Inhalte & echte Daten
 - [ ] Echte Fotos statt Platzhalter einsetzen (Hero, Galerie, Team, Über uns)
-- [ ] Team prüfen (Namen / Rollen / Fotos) — und mit der **Mitarbeiterliste im Buchungssystem** abgleichen (aktuell: Katja, Jana, Mira, Tom)
+- [ ] Team prüfen (Namen / Rollen / Fotos) — und mit der **Mitarbeiterliste im Buchungssystem** abgleichen (aktuell: Mia, Jana, Mira, Tom)
 - [ ] Leistungen & Preise prüfen
 - [ ] Öffnungszeiten prüfen (aktuell **Mi–Sa 11–17**, Mo/Di/So geschlossen) — bestimmt die buchbaren Uhrzeiten
-- [ ] Kontaktdaten prüfen: Telefon, E-Mail, Adresse (aktuell Telefon 0178 8179912, E-Mail Platzhalter `hallo@hundesalon-emika.de`)
+- [ ] Kontaktdaten prüfen: Telefon, E-Mail, Adresse (aktuell Telefon 01234 / 567 890, E-Mail Platzhalter `hallo@hundesalon-luna.de`)
 - [ ] Bewertungs-Texte / Google-Bewertungen prüfen
 - [ ] Ggf. Termindauer je Leistung differenzieren (aktuell pauschal 60 Min)
 
@@ -45,7 +45,7 @@ Die Platzhalter stehen im Footer unter „Impressum" und „Datenschutz".
 ---
 
 ## 4. Domain & Veröffentlichung
-- [ ] Eigene Domain mit Vercel verbinden (z. B. `hundesalon-emika.de`)
+- [ ] Eigene Domain mit Vercel verbinden (z. B. `hundesalon-luna.de`)
 - [ ] Absender-Domain (`FROM_EMAIL`) bei Resend verifizieren (SPF/DKIM)
 - [ ] Favicon / Branding final prüfen
 
