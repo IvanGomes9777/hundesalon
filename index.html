@@ -155,10 +155,10 @@ html[data-frame="eckig"] .frame{ border-radius:18px; }
 .chip small{ display:block; font-family:var(--font-body); font-weight:600; color:var(--muted); font-size:12px; }
 
 /* reveal on scroll */
-.reveal{ opacity:0; transform:translateY(56px) scale(.95); transition:opacity .85s var(--ease), transform .85s var(--ease); will-change:opacity, transform; }
-.reveal.in{ opacity:1; transform:none; }
+.reveal{ opacity:0; transform:translateY(64px) scale(.955); filter:blur(8px); transition:opacity .9s var(--ease), transform .9s var(--ease), filter .9s var(--ease); will-change:opacity, transform, filter; }
+.reveal.in{ opacity:1; transform:none; filter:none; }
 @media (prefers-reduced-motion: reduce){
-  .reveal{ opacity:1 !important; transform:none !important; transition:none !important; }
+  .reveal{ opacity:1 !important; transform:none !important; filter:none !important; transition:none !important; }
 }
 
 /* ============================ NAV ============================ */
@@ -1155,23 +1155,24 @@ function Reveal({ children, className = "", delay = 0, as = "div", style }) {
   useEffect(() => {
     const el = ref.current; if (!el) return;
     let settleT;
-    const reveal = () => { setSeen(true); settleT = setTimeout(() => setSettled(true), 900); };
-    const check = () => {
-      const r = el.getBoundingClientRect();
-      if (r.top < (window.innerHeight || 800) * 0.92 && r.bottom > 0) { reveal(); return true; }
-      return false;
-    };
-    if (check()) return () => clearTimeout(settleT);
-    const cleanup = () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      clearTimeout(safety);
-    };
-    const onScroll = () => { if (check()) cleanup(); };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    const safety = setTimeout(reveal, 1600);
-    return () => { cleanup(); clearTimeout(settleT); };
+    const reveal = () => { setSeen(true); settleT = setTimeout(() => setSettled(true), 1000); };
+    const vh = window.innerHeight || 800;
+    const r = el.getBoundingClientRect();
+    // Schon (fast) im Viewport beim Laden -> direkt zeigen, kein Flackern.
+    if (r.top < vh * 0.85 && r.bottom > 0) { reveal(); return () => clearTimeout(settleT); }
+    if (typeof IntersectionObserver === "undefined") {
+      const safety = setTimeout(reveal, 1200);
+      return () => { clearTimeout(safety); clearTimeout(settleT); };
+    }
+    // Erst auslösen, wenn die Sektion deutlich sichtbar in den Viewport scrollt.
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) { reveal(); io.disconnect(); break; }
+      }
+    }, { threshold: 0.15, rootMargin: "0px 0px -12% 0px" });
+    io.observe(el);
+    const safety = setTimeout(() => { reveal(); io.disconnect(); }, 2600);
+    return () => { io.disconnect(); clearTimeout(safety); clearTimeout(settleT); };
   }, []);
   const Tag = as;
   const sStyle = settled
@@ -2408,16 +2409,18 @@ function Booking() {
   return (
     <div className="book-shell" id="booking-shell">
       <div className="book-aside">
-        <span className="eyebrow" style={{ background: "rgba(255,255,255,.18)", color: "#fff" }}>
-          <Paw /> Termin sichern
-        </span>
-        <h2 style={{ marginTop: 18 }}>In 3 Schritten zum Wohlfühl-Termin</h2>
-        <p>Sag uns, was dein Liebling braucht — wir kümmern uns um den Rest. Schnell, unkompliziert und ganz ohne Stress.</p>
-        <div className="b-list">
-          <div><Paw /> Kostenlose Beratung vor Ort</div>
-          <div><Paw /> Flexible Termine, auch samstags</div>
-          <div><Paw /> Absage bis 24 h vorher gratis</div>
-        </div>
+        <Reveal>
+          <span className="eyebrow" style={{ background: "rgba(255,255,255,.18)", color: "#fff" }}>
+            <Paw /> Termin sichern
+          </span>
+          <h2 style={{ marginTop: 18 }}>In 3 Schritten zum Wohlfühl-Termin</h2>
+          <p>Sag uns, was dein Liebling braucht — wir kümmern uns um den Rest. Schnell, unkompliziert und ganz ohne Stress.</p>
+          <div className="b-list">
+            <div><Paw /> Kostenlose Beratung vor Ort</div>
+            <div><Paw /> Flexible Termine, auch samstags</div>
+            <div><Paw /> Absage bis 24 h vorher gratis</div>
+          </div>
+        </Reveal>
         <div className="blob-bg"></div>
       </div>
 
