@@ -1158,21 +1158,19 @@ function Reveal({ children, className = "", delay = 0, as = "div", style }) {
     const reveal = () => { setSeen(true); settleT = setTimeout(() => setSettled(true), 1200); };
     const vh = window.innerHeight || 800;
     const r = el.getBoundingClientRect();
-    // Schon (fast) im Viewport beim Laden -> direkt zeigen, kein Flackern.
+    // Schon im sichtbaren Bereich beim Laden -> direkt zeigen, kein Flackern.
     if (r.top < vh * 0.85 && r.bottom > 0) { reveal(); return () => clearTimeout(settleT); }
-    if (typeof IntersectionObserver === "undefined") {
-      const safety = setTimeout(reveal, 1200);
-      return () => { clearTimeout(safety); clearTimeout(settleT); };
-    }
-    // Erst auslösen, wenn die Sektion deutlich sichtbar in den Viewport scrollt.
+    // Kein IntersectionObserver (sehr alte Browser) -> ohne Animation zeigen.
+    if (typeof IntersectionObserver === "undefined") { reveal(); return () => clearTimeout(settleT); }
+    // Pro Sektion exakt dann auslösen, wenn sie ins Bild scrollt – KEIN
+    // pauschaler Timer, sonst sind untere Sektionen vorab schon eingeblendet.
     const io = new IntersectionObserver((entries) => {
       for (const e of entries) {
         if (e.isIntersecting) { reveal(); io.disconnect(); break; }
       }
-    }, { threshold: 0.15, rootMargin: "0px 0px -18% 0px" });
+    }, { threshold: 0, rootMargin: "0px 0px -15% 0px" });
     io.observe(el);
-    const safety = setTimeout(() => { reveal(); io.disconnect(); }, 2600);
-    return () => { io.disconnect(); clearTimeout(safety); clearTimeout(settleT); };
+    return () => { io.disconnect(); clearTimeout(settleT); };
   }, []);
   const Tag = as;
   const sStyle = settled
