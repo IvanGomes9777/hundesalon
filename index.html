@@ -155,7 +155,7 @@ html[data-frame="eckig"] .frame{ border-radius:18px; }
 .chip small{ display:block; font-family:var(--font-body); font-weight:600; color:var(--muted); font-size:12px; }
 
 /* reveal on scroll */
-.reveal{ opacity:0; transform:translateY(64px) scale(.955); filter:blur(8px); transition:opacity .9s var(--ease), transform .9s var(--ease), filter .9s var(--ease); will-change:opacity, transform, filter; }
+.reveal{ opacity:0; transform:translateY(92px) scale(.9); filter:blur(12px); transition:opacity .95s var(--ease), transform 1.05s cubic-bezier(.16,.78,.28,1.06), filter .95s var(--ease); will-change:opacity, transform, filter; }
 .reveal.in{ opacity:1; transform:none; filter:none; }
 @media (prefers-reduced-motion: reduce){
   .reveal{ opacity:1 !important; transform:none !important; filter:none !important; transition:none !important; }
@@ -1155,7 +1155,7 @@ function Reveal({ children, className = "", delay = 0, as = "div", style }) {
   useEffect(() => {
     const el = ref.current; if (!el) return;
     let settleT;
-    const reveal = () => { setSeen(true); settleT = setTimeout(() => setSettled(true), 1000); };
+    const reveal = () => { setSeen(true); settleT = setTimeout(() => setSettled(true), 1200); };
     const vh = window.innerHeight || 800;
     const r = el.getBoundingClientRect();
     // Schon (fast) im Viewport beim Laden -> direkt zeigen, kein Flackern.
@@ -1169,7 +1169,7 @@ function Reveal({ children, className = "", delay = 0, as = "div", style }) {
       for (const e of entries) {
         if (e.isIntersecting) { reveal(); io.disconnect(); break; }
       }
-    }, { threshold: 0.15, rootMargin: "0px 0px -12% 0px" });
+    }, { threshold: 0.15, rootMargin: "0px 0px -18% 0px" });
     io.observe(el);
     const safety = setTimeout(() => { reveal(); io.disconnect(); }, 2600);
     return () => { io.disconnect(); clearTimeout(safety); clearTimeout(settleT); };
